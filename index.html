@@ -8,21 +8,20 @@
     <title>Twittler</title>
   </head>
   <body>
-    <!--
+
     <audio autoplay loop>
       <source src="assests/sound.mp3">
     </audio>
-    -->
+    
     <a href="index.html"><img src="assests/twitterLogo1.png" alt="Logo" id="logo"></a>
+
     <button type="button" class="btn refresh">Refresh Tweets</button>
-    <!--<button type="button" class="btn hide">Hide Tweets</button>-->
     <button type="button" class="btn darkmodeON">Dark Mode ON</button>
     <button type="button" class="btn darkmodeOFF">Dark Mode OFF</button>
 
 
     <script>
       $(document).ready(function(){
-
         var $body = $('body');
         var isFirstTime = true;
         var isDarkModeOn = false;
@@ -49,11 +48,14 @@
             $timeStamp.addClass("timeStamp");
 
             //username as a link
-            var $link = $('<a></a>')
+            var $link = $('<a></a>');
+            //$link.attr("id", "link")
             $link.text("@" + tweet.user);
-            //$link.attr("href", "");
             $userName.html($link);
 
+            //check if the tweet contains a hashtag
+              //if so insert it as a text to span and later on, style can be applied
+              //If not then attach the tweet as a regular message.
             if (hasHashtag(tweet.message)) {
               var $span = $('<span></span>');
               $span.addClass("hashtag");
@@ -66,7 +68,7 @@
             }
 
             //moment.js to get the twitter time format
-            var timeStamp = moment().format('h:mm a - Do MMMM YYYY');
+            var timeStamp = moment().format('h:mm a - Do MMM YYYY');
             $timeStamp.text(timeStamp);
 
             //append everything to content and append content to container
@@ -79,6 +81,7 @@
 
             //fill = bar;
           }
+
           if(isFirstTime) {
             return $container;
           } else {
@@ -94,38 +97,36 @@
         $(".refresh").on("click", function() {
           //container to hold all other containers
           var $bigContainer = $('<div></div>');
-          $bigContainer.attr("id", "container");
+          $bigContainer.attr("id", "bigcontainer");
 
+          //very important! - the very first time the bigcontainer is made and the container that holds the set of tweets is pushed in to the big container
           if (isFirstTime) {
             $body.append($bigContainer);
-            if(isDarkModeOn) {
-              $bigContainer.append(fill().find(".content").css(
-                {"background-color": "black", 
-                 "color": "white"
-                }));
-            } else {
-              $bigContainer.append(fill());
-            }
+            $bigContainer.append(fill());
             isFirstTime = false;
-          } else {
+          } else { 
+          //second time, we just find the bigcontainer with the tag and prepend the container that holds the tweet. This helps to show new tweets at the beginning.
             if (isDarkModeOn) {
-              $("#container").prepend(fill().find(".content").css(
+              var $c = fill();
+              $("#bigcontainer").prepend($c);
+              $("#bigcontainer #container .content").css(
                 {"background-color": "black", 
                  "color": "white"
-                }));
+                });
             } else {
-              $("#container").prepend(fill());
+              $("#bigcontainer").prepend(fill());
             }
           }
         });
-
+  
+        //dark mode feature
         $(".darkmodeON").on("click", function() {
           isDarkModeOn = true;
           $("body").css("background-color", "black");
-          $("#container .content").css("background-color", "black");
-          $("#container .content").css("color", "white");
-          //$("#container .empty").css({"background-color": "pink", "color": "#1dcaff"});
-          //$("#container .content .userName").css("color", "#1dcaff");
+          $("#bigcontainer #container .content").css(
+            {"background-color": "black", 
+                 "color": "white"
+            });
           $(this).prop("disabled", true);
           $(".darkmodeOFF").prop("disabled", false);
         });
@@ -133,15 +134,11 @@
         $(".darkmodeOFF").on("click", function() {
           isDarkModeOn = false;
           $("body").css("background-color", "#1dcaff");
-          $("#container .content").css("background-color", "white");
-          $("#container .content").css("color", "black");
-          //$("#container .empty").css({"background-color": "pink", "color": "#1dcaff"});
+          $("#bigcontainer #container .content").css(
+            {"background-color": "white", "color": "black"
+            });
           $(this).prop("disabled", true);
           $(".darkmodeON").prop("disabled", false);
-        });
-
-        $(".hide").on("click", function() {
-          $("#container").find("#container").remove();
         });
 
         var hasHashtag = function(str) {
@@ -165,15 +162,16 @@
           return $nullContent;
         }
 
+        //auto-click feature that triggers an automatic click on refresh tweets button so that new tweets are displayed once the webpage is loaded.
         $(".refresh").trigger('click');
 
-        $("#container .content .userName a").on("click", function() {
+        //filter and remove tweets that are not needed - upon clicking the username, this function will filter and remove tweets that are not assciated with that username
+        $("#bigcontainer #container .content .userName a").click(function() {
           var m = $(this).text();
-          $(".content .userName a").filter(function() {
+          console.log(m);
+          $("#bigcontainer #container .content .userName a").filter(function() {
             return m !== $(this).text();
           }).parent().parent().remove();
-
-          console.log(m);
         });
 
       });
