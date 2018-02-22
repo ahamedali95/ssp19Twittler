@@ -1,0 +1,83 @@
+body {
+	background: #1dcaff;
+}
+
+#logo {
+	position: relative;
+	display: block;
+	margin-left: auto;
+	margin-right: auto;
+	border-radius: 50%;
+}
+
+#container {
+	
+}
+
+.content {
+	margin-bottom: 4px;
+	margin-left: 19px;
+	margin-right: 19px;
+	margin-top: 4px;
+	border-radius: 10px;
+	border: 1px solid gray;
+	font: Helvetica Neue;
+	background: white;
+	height: 150px;
+	position: abdolute;
+}
+
+.content .userName a{
+	color: #1dcaff;
+	font-weight: bold;
+	font-size: 15px;
+	position: relative;
+}
+
+.content .tweet {
+	margin-left: 40px;
+	margin-top: 30px;
+	font-style: italic;
+	font-size: 40px;
+	position: relative;
+}
+
+.content .tweet .hashtag {
+	color: #1dcaff;
+}
+
+.content .timeStamp {
+	position: relative;
+	margin-top: 30px;
+}
+
+.empty {
+	height: 15px;
+	text-align: center;
+}
+
+.refresh {
+	margin-left: 19px;
+}
+.hide {
+	margin-left: 19px;
+}
+
+.darkmodeON {
+	float: right;
+	margin-right: 19px;
+}
+
+.darkmodeOFF {
+	float: right;
+	margin-right: 4px;
+}
+
+.btn {
+	background-color: white;
+	font-weight: bold;
+	color: black;
+	border-radius: 20px;
+	height: 30px;
+	width: 100px;
+}

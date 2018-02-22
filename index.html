@@ -1,27 +1,182 @@
 <!DOCTYPE html>
 <html>
   <head>
+    <link rel="stylesheet" type="text/css" href="assests/stylesheets/main.css">
     <script src="jquery.js"></script>
     <script src="data_generator.js"></script>
+    <script src="moment.js"></script>
+    <title>Twittler</title>
   </head>
   <body>
+    <!--
+    <audio autoplay loop>
+      <source src="assests/sound.mp3">
+    </audio>
+    -->
+    <a href="index.html"><img src="assests/twitterLogo1.png" alt="Logo" id="logo"></a>
+    <button type="button" class="btn refresh">Refresh Tweets</button>
+    <!--<button type="button" class="btn hide">Hide Tweets</button>-->
+    <button type="button" class="btn darkmodeON">Dark Mode ON</button>
+    <button type="button" class="btn darkmodeOFF">Dark Mode OFF</button>
+
+
     <script>
-
       $(document).ready(function(){
-        var $body = $('body');
-        $body.html('');
 
-        var index = streams.home.length - 1;
-        while(index >= 0){
-          var tweet = streams.home[index];
-          var $tweet = $('<div></div>');
-          $tweet.text('@' + tweet.user + ': ' + tweet.message);
-          $tweet.appendTo($body);
-          index -= 1;
+        var $body = $('body');
+        var isFirstTime = true;
+        var isDarkModeOn = false;
+
+        var fill = function () {
+          //container to hold all tweets
+          var $container = $('<div></div>');
+          $container.attr("id", "container");
+
+          var index = streams.home.length - 1;
+
+          while(index >= 0) {
+            var tweet = streams.home[index];
+
+            //My content has 3 items - username, tweet, timestamp
+            var $content = $('<div></div>');
+            var $userName = $('<div></div>');
+            var $tweet = $('<div></div>');
+            var $timeStamp = $('<div></div>');
+
+            $content.addClass("content");
+            $tweet.addClass("tweet");
+            $userName.addClass("userName");
+            $timeStamp.addClass("timeStamp");
+
+            //username as a link
+            var $link = $('<a></a>')
+            $link.text("@" + tweet.user);
+            //$link.attr("href", "");
+            $userName.html($link);
+
+            if (hasHashtag(tweet.message)) {
+              var $span = $('<span></span>');
+              $span.addClass("hashtag");
+              $span.text(tweet.message.slice(getHashtagIndex(tweet.message)));
+              $tweet.text(tweet.message.slice(0, getHashtagIndex(tweet.message)));
+              $tweet.append($span);
+
+            } else {
+              $tweet.text(tweet.message);
+            }
+
+            //moment.js to get the twitter time format
+            var timeStamp = moment().format('h:mm a - Do MMMM YYYY');
+            $timeStamp.text(timeStamp);
+
+            //append everything to content and append content to container
+            $content.append($userName);
+            $content.append($tweet);
+            $content.append($timeStamp);
+            $container.append($content);
+
+            index -= 1;
+
+            //fill = bar;
+          }
+          if(isFirstTime) {
+            return $container;
+          } else {
+            //an empty content to separate new tweets
+            var emptyContent = getEmptyContent();
+            $container.append(emptyContent);
+            return $container;
+          }
         }
 
-      });
+        //fill();
 
+        $(".refresh").on("click", function() {
+          //container to hold all other containers
+          var $bigContainer = $('<div></div>');
+          $bigContainer.attr("id", "container");
+
+          if (isFirstTime) {
+            $body.append($bigContainer);
+            if(isDarkModeOn) {
+              $bigContainer.append(fill().find(".content").css(
+                {"background-color": "black", 
+                 "color": "white"
+                }));
+            } else {
+              $bigContainer.append(fill());
+            }
+            isFirstTime = false;
+          } else {
+            if (isDarkModeOn) {
+              $("#container").prepend(fill().find(".content").css(
+                {"background-color": "black", 
+                 "color": "white"
+                }));
+            } else {
+              $("#container").prepend(fill());
+            }
+          }
+        });
+
+        $(".darkmodeON").on("click", function() {
+          isDarkModeOn = true;
+          $("body").css("background-color", "black");
+          $("#container .content").css("background-color", "black");
+          $("#container .content").css("color", "white");
+          //$("#container .empty").css({"background-color": "pink", "color": "#1dcaff"});
+          //$("#container .content .userName").css("color", "#1dcaff");
+          $(this).prop("disabled", true);
+          $(".darkmodeOFF").prop("disabled", false);
+        });
+
+        $(".darkmodeOFF").on("click", function() {
+          isDarkModeOn = false;
+          $("body").css("background-color", "#1dcaff");
+          $("#container .content").css("background-color", "white");
+          $("#container .content").css("color", "black");
+          //$("#container .empty").css({"background-color": "pink", "color": "#1dcaff"});
+          $(this).prop("disabled", true);
+          $(".darkmodeON").prop("disabled", false);
+        });
+
+        $(".hide").on("click", function() {
+          $("#container").find("#container").remove();
+        });
+
+        var hasHashtag = function(str) {
+          return str.indexOf("#") !== -1;
+        }
+
+        var getHashtagIndex = function(str) {
+          return str.indexOf("#");
+        }
+
+        var getEmptyContent = function() {
+          var $nullContent   = $('<div></div>');
+          var $nullTweet  = $('<div></div>');
+
+          $nullContent.addClass("content empty");
+          $nullTweet.addClass("tweets");
+
+          $nullTweet.text("More tweets...");
+          $nullContent.append($nullTweet);
+
+          return $nullContent;
+        }
+
+        $(".refresh").trigger('click');
+
+        $("#container .content .userName a").on("click", function() {
+          var m = $(this).text();
+          $(".content .userName a").filter(function() {
+            return m !== $(this).text();
+          }).parent().parent().remove();
+
+          console.log(m);
+        });
+
+      });
     </script>
   </body>
 </html>
